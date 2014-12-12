@@ -17,6 +17,8 @@
     "url": "https://github.com/ghengeveld/react-techrally.git"
   },
   "dependencies": {
+    "browserify": "^7.0.0",
+    "literalify": "^0.3.0",
     "react": "^0.12.1"
   },
   "devDependencies": {}
