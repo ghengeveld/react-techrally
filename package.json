@@ -1,0 +1,23 @@
+{
+  "name": "react-techrally",
+  "version": "0.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/ghengeveld/react-techrally",
+  "bugs": {
+    "url": "https://github.com/ghengeveld/react-techrally/issues"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ghengeveld/react-techrally.git"
+  },
+  "dependencies": {
+    "react": "^0.12.1"
+  },
+  "devDependencies": {}
+}
