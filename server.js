@@ -18,7 +18,7 @@ http.createServer(function (req, res) {
       var appState = {items: [0, 1, 2, 3]};
       var appHtml = React.renderToString(App(appState));
       var pageHtml = Mustache.render(data, { app : appHtml });
-      res.end(pageHtml);`
+      res.end(pageHtml);
     });
   } else if (req.url == '/bundle.js') {
 
