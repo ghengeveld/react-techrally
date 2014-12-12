@@ -1,10 +1,10 @@
-var http = require('http'),
-  browserify = require('browserify'),
-  literalify = require('literalify'),
-  React = require('react'),
+var http = require('http');
+var fs = require('fs');
+var browserify = require('browserify');
+var literalify = require('literalify');
+var React = require('react');
 // This is our React component, shared by server and browser thanks to browserify
-  MyApp = React.createFactory(require('./myApp'))
-
+var MyApp = React.createFactory(require('./myApp'));
 
 // Just create a plain old HTTP server that responds to two endpoints ('/' and
 // '/bundle.js') This would obviously work similarly with any higher level
@@ -22,14 +22,14 @@ http.createServer(function (req, res) {
     // here (with some potentially dangerous values for testing), but you could
     // imagine this would be objects typically fetched async from a DB,
     // filesystem or API, depending on the logged-in user, etc.
-    var props = {items: [0, 1, 2, 3]}
+    var props = {items: [0, 1, 2, 3]};
 
     // Now that we've got our data, we can perform the server-side rendering by
     // passing it in as `props` to our React component - and returning an HTML
     // string to be sent to the browser
-    var myAppHtml = React.renderToString(MyApp(props))
+    var myAppHtml = React.renderToString(MyApp(props));
 
-    res.setHeader('Content-Type', 'text/html')
+    res.setHeader('Content-Type', 'text/html');
 
     // Now send our page content - this could obviously be constructed in
     // another template engine, or even as a top-level React component itself -
@@ -46,7 +46,7 @@ http.createServer(function (req, res) {
 
         // We'll load React from a CDN - you don't have to do this,
         // you can bundle it up or serve it locally if you like
-        '<script src=//fb.me/react-0.12.0.min.js></script>' +
+        '<script src="/node_modules/react/dist/react.min.js"></script>' +
 
         // Then the browser will fetch the browserified bundle, which we serve
         // from the endpoint further down. This exposes our component so it can be
@@ -62,12 +62,12 @@ http.createServer(function (req, res) {
         'var MyApp = React.createFactory(require("myApp"));' +
         'React.render(MyApp(' + safeStringify(props) + '), document.getElementById("content"))' +
         '</script>'
-    )
+    );
 
     // This endpoint is hit when the browser is requesting bundle.js from the page above
   } else if (req.url == '/bundle.js') {
 
-    res.setHeader('Content-Type', 'text/javascript')
+    res.setHeader('Content-Type', 'text/javascript');
 
     // Here we invoke browserify to package up our component.
     // DON'T do it on the fly like this in production - it's very costly -
@@ -77,22 +77,29 @@ http.createServer(function (req, res) {
     // so that it uses the global variable (from the CDN JS file) instead of
     // bundling it up with everything else
     browserify()
-      .require('./myApp.js', {expose: 'myApp'})
-      .transform({global: true}, literalify.configure({react: 'window.React'}))
-      .bundle()
-      .pipe(res)
+        .require('./myApp.js', {expose: 'myApp'})
+        .transform({global: true}, literalify.configure({react: 'window.React'}))
+        .bundle()
+        .pipe(res);
 
     // Return 404 for all other requests
   } else {
-    res.statusCode = 404
-    res.end()
+    fs.readFile(__dirname + req.url, function (err,data) {
+      if (err) {
+        res.statusCode = 404;
+        res.end(JSON.stringify(err));
+        return;
+      }
+      res.writeHead(200);
+      res.end(data);
+    });
   }
 
 // The http server listens on port 3000
 }).listen(3000, function (err) {
-  if (err) throw err
+  if (err) throw err;
   console.log('Listening on 3000...')
-})
+});
 
 // A utility function to safely escape JSON for embedding in a <script> tag
 function safeStringify(obj) {
